@@ -8,7 +8,7 @@
 #include <random>
 using namespace std;
 
-// Cтруктуры
+// СТРУКТУРЫ
 struct ContinentStats {
     string name;
     string file_name;
@@ -22,7 +22,7 @@ struct Country {
     int  difficulty = 0; // 1-легкий, 2-средний, 3-сложный, 4-эксперт
 };
 
-// Глобальные переменные
+// ГЛОБАЛЬНЫЕ переменные
 const int MAX_COUNTRIES = 200;
 const int NUM_CONTINENTS = 6;
 int total_countries = 0;
@@ -31,7 +31,27 @@ int last_total = 0; // Всего вопросов было задано
 Country countries[MAX_COUNTRIES];
 ContinentStats stats[NUM_CONTINENTS];
 
-// Функции
+// ДОП функции 
+// Функция для удаления лишних пробелов и спецсимволов по краям строки
+void clean(string& s) {
+    if (s.empty()) return;
+    // справа
+    s.erase(s.find_last_not_of(" \n\r\t") + 1);
+    // слева
+    s.erase(0, s.find_first_not_of(" \n\r\t"));
+}
+// Защита от ввода букв вместо цифр в меню
+int get_int_input() {
+    int choice;
+    while (!(cin >> choice)) {
+        cin.clear(); // Сбрасываем флаг ошибки
+        cin.ignore(10000, '\n');
+        cout << "Ошибка! Введите число: ";
+    }
+    return choice;
+}
+
+// ОСНОВНЫЕ функции
 void print_menu() {
     cout << "\n=========================================\n";
     cout << "                 меню                  \n";
@@ -70,17 +90,13 @@ void Save_Stats() {
 void Load_Stats() {
 
     Init_Stats_Array();
-
     ifstream f("stats.txt");
-    if (!f) {
-        return;
-    }
+    if (!f) return;
 
     string f_name;
     int asked, score;
 
     while (f >> f_name >> asked >> score) {
-
         for (int i = 0; i < NUM_CONTINENTS; i++) {
             if (stats[i].file_name == f_name) {
                 stats[i].total_asked = asked;
@@ -105,15 +121,13 @@ void Learning() {
     cout << "=========================================\n";
     cout << "Ваш выбор: ";
 
-    int filter_type = 0;
-    cin >> filter_type;
-
+    int filter_type = get_int_input();
     int diff_choice = 0;
     string cont_choice = "";
 
     if (filter_type == 1) {
         cout << "\nВыберите уровень сложности (1-Легкий, 2-Средний, 3-Сложный, 4-Эксперт, 5-Все): ";
-        cin >> diff_choice;
+        diff_choice = get_int_input();
         cin.ignore(1000, '\n');
     }
     else if (filter_type == 2) {
@@ -121,6 +135,7 @@ void Learning() {
         cout << "(Европа, Азия, Африка, Северная Америка, Южная Америка, Австралия и Океания): ";
         cin.ignore(1000, '\n');
         getline(cin, cont_choice);
+        clean(cont_choice);
     }
     else {
         cout << "\nНекорректный выбор! Возврат в меню.\n\n";
@@ -185,15 +200,13 @@ void Testing() {
     cout << "=========================================\n";
     cout << "Ваш выбор: ";
 
-    int filter_type = 0;
-    cin >> filter_type;
-
+    int filter_type = get_int_input();
     int diff_choice = 0;
     string cont_choice = "";
 
     if (filter_type == 1) {
         cout << "\nВыберите уровень сложности (1-Легкий, 2-Средний, 3-Сложный, 4-Эксперт, 5-Все): ";
-        cin >> diff_choice;
+        diff_choice = get_int_input();
         cin.ignore(1000, '\n');
     }
     else if (filter_type == 2) {
@@ -201,6 +214,7 @@ void Testing() {
         cout << "(Европа, Азия, Африка, Северная Америка, Южная Америка, Австралия и Океания): ";
         cin.ignore(1000, '\n');
         getline(cin, cont_choice);
+        clean(cont_choice);
     }
     else {
         cout << "\nНекорректный выбор! Возврат в меню.\n\n";
@@ -227,7 +241,6 @@ void Testing() {
 
         asked_count++;
 
-        // --- НОВЫЙ БЛОК: Ищем индекс континента текущей страны в массиве статистики ---
         int idx = -1;
         for (int j = 0; j < NUM_CONTINENTS; j++) {
             if (stats[j].name == countries[i].continent) {
@@ -236,32 +249,21 @@ void Testing() {
             }
         }
 
-        // Если нашли континент в базе статистики — засчитываем ему попытку
-        if (idx != -1) {
-            stats[idx].total_asked++;
-        }
-        // --------------------------------------------------------------------------
-
+        if (idx != -1) stats[idx].total_asked++;
+  
         cout << "Вопрос №" << asked_count << " (Континент: " << countries[i].continent << ")\n";
         cout << "Какая столица у страны: " << countries[i].name << "?\n";
         cout << "Ваш ответ: ";
 
         string user_answer;
         getline(cin, user_answer);
-
-        // Очистка ввода от мусорных пробелов
-        while (!user_answer.empty() && (user_answer.back() == ' ' || user_answer.back() == '\r')) {
-            user_answer.pop_back();
-        }
+        clean(user_answer);
 
         if (user_answer == countries[i].capital) {
             cout << "[+] Верно!\n\n";
             correct_answers++;
-
             // Если ответ верный — добавляем балл этому континенту в вечную статистику
-            if (idx != -1) {
-                stats[idx].total_score++;
-            }
+            if (idx != -1) stats[idx].total_score++;
         }
         else {
             cout << "[-] Ошибка! Правильный ответ: " << countries[i].capital << "\n\n";
@@ -284,7 +286,6 @@ void Testing() {
         cout << " Процент правильных ответов: " << percent << "%\n";
         cout << "=========================================\n";
 
-        // --- СВЯЩЕННОДЕЙСТВИЕ: Сохраняем обновленные данные в файл stats.txt ---
         Save_Stats();
         cout << " [Инфо] Общая статистика успешно обновлена в stats.txt!\n";
         cout << "=========================================\n\n";
@@ -301,8 +302,6 @@ void Show_Results() {
             << " (" << current_percent << "%)\n";
         cout << "-------------------------------------------------------\n";
     }
-
-    // Жестко заданная шапка таблицы
     cout << " Континент            | Вопросы   | Верно     | %\n";
     cout << "-------------------------------------------------------\n";
 
@@ -314,31 +313,30 @@ void Show_Results() {
         if (stats[i].total_asked > 0) {
             percent = (double)stats[i].total_score / stats[i].total_asked * 100;
         }
-
-        // 1. Выводим название континента
+        // ТАБЛИЦА
+        // название континента
         cout << " " << stats[i].name;
-        // Добиваем пробелами, чтобы ширина столбца всегда была 21 символ
+        // ширина столбца 21 символ
         int name_len = stats[i].name.length();
         for (int s = 0; s < 21 - name_len; s++) {
             cout << " ";
         }
 
-        // 2. Выводим количество вопросов
+        // количество вопросов
         cout << "| " << stats[i].total_asked;
-        // Превращаем число в строку, чтобы узнать его длину (например, число 10 = 2 символа)
         int asked_len = to_string(stats[i].total_asked).length();
         for (int s = 0; s < 10 - asked_len; s++) {
             cout << " ";
         }
 
-        // 3. Выводим правильные ответы
+        // правильные ответы
         cout << "| " << stats[i].total_score;
         int score_len = to_string(stats[i].total_score).length();
         for (int s = 0; s < 10 - score_len; s++) {
             cout << " ";
         }
 
-        // 4. Выводим процент
+        // процент
         cout << "| " << percent << "%\n";
 
         grand_total_asked += stats[i].total_asked;
@@ -351,7 +349,6 @@ void Show_Results() {
         total_percent = (double)grand_total_score / grand_total_asked * 100;
     }
 
-    // Подвал таблицы
     cout << " ВСЕГО ЗА ВСЕ ВРЕМЯ   | " << grand_total_asked;
 
     int grand_asked_len = to_string(grand_total_asked).length();
@@ -371,7 +368,7 @@ void menu(){
     int choice = 0;
     do {
         print_menu();
-        cin >> choice;
+        choice = get_int_input();
         switch (choice) {
         case 1:
             Learning();
@@ -400,6 +397,7 @@ void Load_Countries(const char* filename) {
 
     int count = 0;
     int currentDiff = 0;
+
     string line;
 
     while (getline(f, line)) {
@@ -414,32 +412,17 @@ void Load_Countries(const char* filename) {
         if (line.length() >= 3) {
             if (line.substr(0, 3) == "Q: ") {
                 countries[total_countries].name = line.substr(3);
+                clean(countries[total_countries].name);
                 countries[total_countries].difficulty = currentDiff;
             }
             else if (line.substr(0, 3) == "C: ") {
-                string clean_cont = line.substr(3);
-                while (!clean_cont.empty() && (clean_cont.back() == '\r' || clean_cont.back() == ' ' || clean_cont.back() == '\n' || clean_cont.back() == '\t')) {
-                    clean_cont.pop_back();
-                }
-                while (!clean_cont.empty() && clean_cont.front() == ' ') {
-                    clean_cont.erase(clean_cont.begin());
-                }
-                countries[total_countries].continent = clean_cont;
+                countries[total_countries].continent = line.substr(3);
+                clean(countries[total_countries].continent);
             }
             else if (line.substr(0, 3) == "A: ") {
-                string clean_cap = line.substr(3);
+                countries[total_countries].capital = line.substr(3);
+                clean(countries[total_countries].capital);
 
-                // лишние пробелы, \r и табы в конце слова
-                while (!clean_cap.empty() && (clean_cap.back() == '\r' || clean_cap.back() == ' ' || clean_cap.back() == '\n' || clean_cap.back() == '\t')) {
-                    clean_cap.pop_back();
-                }
-
-                // лишние пробелы в начале слова
-                while (!clean_cap.empty() && clean_cap.front() == ' ') {
-                    clean_cap.erase(clean_cap.begin());
-                }
-
-                countries[total_countries].capital = clean_cap;
                 total_countries++;
             }
         }
