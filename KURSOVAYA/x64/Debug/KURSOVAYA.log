@@ -1,0 +1,7 @@
+﻿  KURSOVAYA.cpp
+D:\Курсовая ОАИП\KURSOVAYA\KURSOVAYA\KURSOVAYA.cpp(321,22): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+D:\Курсовая ОАИП\KURSOVAYA\KURSOVAYA\KURSOVAYA.cpp(329,23): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+D:\Курсовая ОАИП\KURSOVAYA\KURSOVAYA\KURSOVAYA.cpp(336,23): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+D:\Курсовая ОАИП\KURSOVAYA\KURSOVAYA\KURSOVAYA.cpp(357,25): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+D:\Курсовая ОАИП\KURSOVAYA\KURSOVAYA\KURSOVAYA.cpp(362,25): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  KURSOVAYA.vcxproj -> D:\Курсовая ОАИП\KURSOVAYA\x64\Debug\KURSOVAYA.exe
